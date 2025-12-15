@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <header className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-around items-center h-20 w-full">
           <Link href="/" className="flex items-center">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-orange-500 rounded flex items-center justify-center">
