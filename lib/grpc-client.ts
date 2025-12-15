@@ -3,6 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import fs from 'fs';
 
+// Updated Interface with Auth Methods
 interface CompanyServiceClient {
     CreateCompany: (req: any, cb: (err: any, res: any) => void) => void;
     GetCompany: (req: any, cb: (err: any, res: any) => void) => void;
@@ -11,6 +12,7 @@ interface CompanyServiceClient {
     UpdateCompanyContact: (req: any, cb: (err: any, res: any) => void) => void;
     UpdateCompanyBanking: (req: any, cb: (err: any, res: any) => void) => void;
 
+    // Auth Methods
     Register: (req: any, cb: (err: any, res: any) => void) => void;
     VerifyEmail: (req: any, cb: (err: any, res: any) => void) => void;
     ValidateCredentials: (req: any, cb: (err: any, res: any) => void) => void;
@@ -18,21 +20,22 @@ interface CompanyServiceClient {
     close: () => void;
 }
 
+// Cache for gRPC clients
 let companyServiceClient: CompanyServiceClient | null = null;
 
 export async function createCompanyGrpcClient(): Promise<CompanyServiceClient> {
-    if (companyServiceClient) {
-        return companyServiceClient;
-    }
+    if (companyServiceClient) return companyServiceClient;
 
     try {
+        // 1. Define Path
         let PROTO_PATH = path.join(
             process.cwd(),
             'proto/companies/v1/company.proto'
         );
 
+        // 2. Fallback check (optional)
         if (!fs.existsSync(PROTO_PATH)) {
-            console.log('⚠️  Proto not found in Next.js project, trying NestJS location...');
+            console.log('⚠️  Proto not found in Next.js project, searching backend...');
             PROTO_PATH = path.join(
                 process.cwd(),
                 '../backend/libs/grpc-contracts/src/proto/definations/companies/v1/company.proto'
@@ -40,9 +43,10 @@ export async function createCompanyGrpcClient(): Promise<CompanyServiceClient> {
         }
 
         if (!fs.existsSync(PROTO_PATH)) {
-            throw new Error(`❌ Proto file not found at ${PROTO_PATH}`);
+            throw new Error(`❌ Proto file not found at: ${PROTO_PATH}`);
         }
 
+        // 3. Load Definition
         const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
             keepCase: true,
             longs: String,
@@ -51,27 +55,19 @@ export async function createCompanyGrpcClient(): Promise<CompanyServiceClient> {
             oneofs: true,
         });
 
+        // 4. Create Client
         const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
-
         const companyPackage = protoDescriptor.companies?.v1;
 
-        if (!companyPackage || !companyPackage.CompanyService) {
-            throw new Error(
-                'CompanyService not found in proto definition. ' +
-                'Available keys: ' + Object.keys(protoDescriptor).join(', ')
-            );
+        if (!companyPackage?.CompanyService) {
+            throw new Error('CompanyService not found in proto definition');
         }
 
-        const CompanyService = companyPackage.CompanyService;
         const GRPC_SERVER_URL = process.env.COMPANY_SERVICE_URL || 'localhost:50051';
 
-        console.log(`🔗 Connecting to gRPC server at: ${GRPC_SERVER_URL}`);
-
-        const credentials = grpc.credentials.createInsecure();
-
-        companyServiceClient = new CompanyService(
+        companyServiceClient = new companyPackage.CompanyService(
             GRPC_SERVER_URL,
-            credentials
+            grpc.credentials.createInsecure()
         ) as CompanyServiceClient;
 
         return companyServiceClient;

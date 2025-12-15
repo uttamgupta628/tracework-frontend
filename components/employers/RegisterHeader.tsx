@@ -61,13 +61,13 @@ export default function AuthHeader() {
           {/* Right Side Buttons */}
           <div className="flex items-center gap-3">
             <Link
-              href="/login"
+              href="/auth/login"
               className="px-6 py-2 border-2 border-orange-500 text-orange-500 font-semibold rounded-md hover:bg-orange-50 transition-colors"
             >
               Login
             </Link>
             <Link
-              href="/register"
+              href="/auth/register"
               className="px-6 py-2 bg-[#0A0A3D] text-white font-semibold rounded-md hover:bg-[#14145A] transition-colors"
             >
               Register Now
@@ -76,7 +76,7 @@ export default function AuthHeader() {
               href="/jobseekers"
               className="px-6 py-2 text-gray-700 font-semibold hover:text-orange-500 transition-colors"
             >
-              Jobseeker's
+              Jobseeker&#39;s
             </Link>
           </div>
         </div>
