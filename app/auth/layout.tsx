@@ -1,6 +1,6 @@
 'use client';
 
-import AuthHeader from "../components/employers/RegisterHeader";
+import AuthHeader from "@/components/employers/RegisterHeader";
 
 export default function AuthLayout({
   children,
