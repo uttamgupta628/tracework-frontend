@@ -221,10 +221,11 @@ message CompanyBankingResponse {
   string account_number = 4;
   string bank_name = 5;
   string branch_name = 6;
-  string ifsc_code = 7;
-  bool is_verified = 8;
-  google.protobuf.Timestamp created_at = 9;
-  google.protobuf.Timestamp updated_at = 10;
+  string account_type = 7;
+  string ifsc_code = 8;
+  bool is_verified = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
 }
 
 message GetCompanyFullDetailsResponse {

@@ -74,19 +74,19 @@ export default function MyProfile() {
                         address: company.address,
                         state: contact?.state,
                         city: contact?.city,
-                        pinCode: contact?.pinCode,
+                        pinCode: contact?.pin_code,
                         linkedin: contact?.linkedin,
                         instagram: contact?.instagram,
                         twitter: contact?.twitter,
 
                         // Banking Info
-                        accountHolderName: banking?.accountHolderName,
-                        accountNumber: banking?.accountNumber,
-                        bankName: banking?.bankName,
-                        branchName: banking?.branchName,
-                        ifscCode: banking?.ifscCode,
+                        accountHolderName: banking?.account_holder_name,
+                        accountNumber: banking?.account_number,
+                        bankName: banking?.account_number,
+                        branchName: banking?.branch_name,
+                        ifscCode: banking?.ifsc_code,
                         accountType: 'savings', // Default or fetch if available
-                        confirmAccountNumber: banking?.accountNumber
+                        confirmAccountNumber: banking?.account_number
                     });
                 }
             } catch (error) {
@@ -110,7 +110,6 @@ export default function MyProfile() {
             let payload: any = {};
             let updateType = '';
 
-            // Construct payload based on active tab
             if (activeTab === 'company') {
                 updateType = 'general';
                 payload = {
@@ -132,11 +131,9 @@ export default function MyProfile() {
                 updateType = 'contact';
                 payload = {
                     companyId: company.id,
-                    // Fields for Company Entity
                     email: data.email,
                     phone: data.mobile,
                     address: data.address,
-                    // Fields for CompanyContact Entity
                     state: data.state,
                     city: data.city,
                     pinCode: data.pinCode,
@@ -151,6 +148,7 @@ export default function MyProfile() {
                     accountHolderName: data.accountHolderName,
                     accountNumber: data.accountNumber,
                     bankName: data.bankName,
+                    accountType: data.accountType,
                     branchName: data.branchName,
                     ifscCode: data.ifscCode,
                 };

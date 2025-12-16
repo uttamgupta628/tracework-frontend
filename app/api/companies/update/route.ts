@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
                 metadata: body.metadata
             };
 
-            console.log(`updateRequest: `, updateRequest)
 
             response = await new Promise((resolve, reject) => {
                 client.UpdateCompany(updateRequest, (err, res) => {
@@ -41,7 +40,6 @@ export async function POST(request: NextRequest) {
 
         // --- 2. Contact Info Update ---
         else if (updateType === 'contact') {
-            // Contact tab contains fields from both Company entity (phone, address) and Contact entity
 
             // A. Update Base Company Fields (Phone, Address, Email)
             await new Promise((resolve, reject) => {
@@ -49,7 +47,7 @@ export async function POST(request: NextRequest) {
                     id: body.companyId,
                     address: body.address,
                     phone: body.phone,
-                    email: body.email
+                    email: body.email,
                 }, (err, res) => {
                     if (err) reject(err);
                     else resolve(res);
@@ -62,7 +60,7 @@ export async function POST(request: NextRequest) {
                     companyId: body.companyId,
                     state: body.state,
                     city: body.city,
-                    pinCode: body.pinCode,
+                    pin_code: body.pinCode,
                     linkedin: body.linkedin,
                     instagram: body.instagram,
                     twitter: body.twitter,
@@ -78,11 +76,12 @@ export async function POST(request: NextRequest) {
             response = await new Promise((resolve, reject) => {
                 client.UpdateCompanyBanking({
                     companyId: body.companyId,
-                    accountHolderName: body.accountHolderName,
-                    accountNumber: body.accountNumber,
-                    bankName: body.bankName,
-                    branchName: body.branchName,
-                    ifscCode: body.ifscCode,
+                    account_holder_name: body.accountHolderName,
+                    account_number: body.accountNumber,
+                    bank_name: body.bankName,
+                    branch_name: body.branchName,
+                    ifsc_code: body.ifscCode,
+
                 }, (err, res) => {
                     if (err) reject(err);
                     else resolve(res);
