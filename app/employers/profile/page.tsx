@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '@/lib/features/auth/authSlice';
-import { useAppSelector } from '@/lib/hooks'; // Ensure you have this hook or use useSelector directly
+import React, {useState, useEffect} from 'react';
+import {useForm, FormProvider} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useDispatch} from 'react-redux';
+import {setCredentials} from '@/lib/features/auth/authSlice';
+import {useAppSelector} from '@/lib/hooks'; // Ensure you have this hook or use useSelector directly
 import {
     companyInfoSchema,
     contactInfoSchema,
@@ -13,9 +13,9 @@ import {
     ContactInfoFormValues,
     BankingInfoFormValues
 } from '@/lib/schemas';
-import { CompanyInfoTab } from '@/components/tabs/CompanyInfoTab';
-import { ContactInfoTab } from '@/components/tabs/ContactInfoTab';
-import { BankingInfoTab } from "@/components/tabs/BankingInfoTab";
+import {CompanyInfoTab} from '@/components/tabs/CompanyInfoTab';
+import {ContactInfoTab} from '@/components/tabs/ContactInfoTab';
+import {BankingInfoTab} from "@/components/tabs/BankingInfoTab";
 
 type FormValues = Partial<CompanyInfoFormValues> & Partial<ContactInfoFormValues> & Partial<BankingInfoFormValues>;
 
@@ -25,7 +25,7 @@ export default function MyProfile() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Get company ID from Redux state
-    const { company } = useAppSelector((state) => state.auth);
+    const {company} = useAppSelector((state) => state.auth);
     const dispatch = useDispatch();
 
     const currentSchema =
@@ -49,7 +49,7 @@ export default function MyProfile() {
                     headers: {'Content-Type': 'application/json'},
                 });
                 const result = await res.json();
-                console.log(`Fetched profile: ${JSON.stringify(result, null, 2)}`)
+                console.log(`Fetched profile: `, result)
                 if (result.success && result.data) {
                     const {company, contact, banking} = result.data;
 
@@ -154,7 +154,7 @@ export default function MyProfile() {
 
             const res = await fetch(`/api/companies/update?type=${updateType}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload),
             });
 
@@ -222,7 +222,8 @@ export default function MyProfile() {
                         </div>
                     </div>
 
-                    <div className="fixed bottom-0 right-0 left-0 md:left-64 bg-white border-t border-gray-200 p-4 flex justify-end items-center gap-4 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+                    <div
+                        className="fixed bottom-0 right-0 left-0 md:left-64 bg-white border-t border-gray-200 p-4 flex justify-end items-center gap-4 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                         <button
                             type="button"
                             disabled={isSubmitting}
@@ -236,7 +237,8 @@ export default function MyProfile() {
                             disabled={isSubmitting}
                             className="px-6 py-2.5 bg-[#0a1128] text-white rounded-lg hover:bg-[#1a2340] font-medium text-sm transition-colors disabled:opacity-70 flex items-center gap-2"
                         >
-                            {isSubmitting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                            {isSubmitting && <div
+                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
                             Save
                         </button>
                     </div>

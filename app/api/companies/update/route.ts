@@ -1,16 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createCompanyGrpcClient } from '@/lib/grpc-client';
+import {NextRequest, NextResponse} from 'next/server';
+import {createCompanyGrpcClient} from '@/lib/grpc-client';
 
 export async function POST(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url);
+        const {searchParams} = new URL(request.url);
         const updateType = searchParams.get('type') || 'general';
+        console.log('Updating company with type:', updateType);
         const body = await request.json();
-
+        console.log('body', body)
         // ID is required for any update
         const id = body.id || body.companyId;
         if (!id) {
-            return NextResponse.json({ message: 'Company ID is required' }, { status: 400 });
+            return NextResponse.json({message: 'Company ID is required'}, {status: 400});
         }
 
         const client = await createCompanyGrpcClient();
@@ -22,9 +23,8 @@ export async function POST(request: NextRequest) {
                 id: body.id,
                 companyName: body.companyName,
                 description: body.description,
-                websiteUrl: body.websiteUrl,
-                // Passing metadata (PAN, GST, etc.) if the backend supports it in the 'UpdateCompany'
-                // logic you implemented in the previous step
+                websiteUrl: body.website_url,
+                logoUrl: body.logo_url,
                 metadata: body.metadata
             };
 
@@ -86,10 +86,10 @@ export async function POST(request: NextRequest) {
                 });
             });
         } else {
-            return NextResponse.json({ message: 'Invalid update type' }, { status: 400 });
+            return NextResponse.json({message: 'Invalid update type'}, {status: 400});
         }
 
-        return NextResponse.json({ success: true, data: response });
+        return NextResponse.json({success: true, data: response});
 
     } catch (error: any) {
         console.error('Error updating company:', error);
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
                 success: false,
                 message: error.details || 'Failed to update company information'
             },
-            { status: 500 }
+            {status: 500}
         );
     }
 }

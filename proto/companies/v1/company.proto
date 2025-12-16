@@ -51,6 +51,13 @@ message GetCompanyRequest {
   string id = 1;
 }
 
+message CompanyMetadata {
+  optional string pan = 1;
+  optional string gst = 2;
+  optional string tan = 3;
+  optional int32 strength = 4;
+}
+
 message UpdateCompanyRequest {
   string id = 1;
   optional string company_name = 2;
@@ -63,6 +70,7 @@ message UpdateCompanyRequest {
   optional string website_url = 9;
   optional string status = 10;
   optional string updated_by = 11;  // FR-II-001.4: Change tracking
+  optional CompanyMetadata metadata = 12;
 }
 
 message UpdateCompanyStatusRequest {
