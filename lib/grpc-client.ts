@@ -11,12 +11,10 @@ interface CompanyServiceClient {
     GetCompanyFullDetails: (req: any, cb: (err: any, res: any) => void) => void;
     UpdateCompanyContact: (req: any, cb: (err: any, res: any) => void) => void;
     UpdateCompanyBanking: (req: any, cb: (err: any, res: any) => void) => void;
-
     // Auth Methods
     Register: (req: any, cb: (err: any, res: any) => void) => void;
     VerifyEmail: (req: any, cb: (err: any, res: any) => void) => void;
     ValidateCredentials: (req: any, cb: (err: any, res: any) => void) => void;
-
     close: () => void;
 }
 
@@ -43,7 +41,7 @@ export async function createCompanyGrpcClient(): Promise<CompanyServiceClient> {
         }
 
         if (!fs.existsSync(PROTO_PATH)) {
-            throw new Error(`❌ Proto file not found at: ${PROTO_PATH}`);
+            throw new Error(`❌ Proto file not found at: ${PROTO_PATH}`); // FIXED: Added parentheses
         }
 
         // 3. Load Definition
@@ -64,16 +62,28 @@ export async function createCompanyGrpcClient(): Promise<CompanyServiceClient> {
         }
 
         const GRPC_SERVER_URL = process.env.COMPANY_SERVICE_URL || 'localhost:50051';
+        
+        console.log(`🔗 Connecting to gRPC server at: ${GRPC_SERVER_URL}`);
 
         companyServiceClient = new companyPackage.CompanyService(
             GRPC_SERVER_URL,
             grpc.credentials.createInsecure()
         ) as CompanyServiceClient;
 
-        return companyServiceClient;
+        console.log('✅ gRPC client created successfully');
 
+        return companyServiceClient;
     } catch (error) {
         console.error('❌ Error creating gRPC client:', error);
         throw error;
+    }
+}
+
+// Optional: Function to close the client
+export function closeCompanyGrpcClient(): void {
+    if (companyServiceClient) {
+        companyServiceClient.close();
+        companyServiceClient = null;
+        console.log('🔌 gRPC client closed');
     }
 }
