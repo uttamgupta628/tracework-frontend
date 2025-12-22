@@ -1,4 +1,3 @@
-// [aryankumarofficial/tracework-frontend/tracework-frontend-d48e64cadcf6f86a6272544d06b44555dfd8c1f8/app/employers/profile/page.tsx]
 "use client";
 import React, {useState, useEffect, useCallback} from 'react';
 import {useForm, FormProvider} from 'react-hook-form';
@@ -25,8 +24,7 @@ export default function MyProfile() {
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // New state for verification flow
-    const [isProfileComplete, setIsProfileComplete] = useState(false);
+    // Status state
     const [companyStatus, setCompanyStatus] = useState<string>('');
 
     // Get company ID from Redux state
@@ -45,6 +43,17 @@ export default function MyProfile() {
         shouldUnregister: false,
     });
 
+    // Watch all fields to determine completeness in real-time
+    const watchedValues = methods.watch();
+    const isProfileComplete = !!(
+        watchedValues.pan &&
+        watchedValues.gst &&
+        watchedValues.tan &&
+        watchedValues.accountNumber &&
+        watchedValues.ifscCode &&
+        watchedValues.bankName
+    );
+
     const fetchProfile = useCallback(async () => {
         try {
             const res = await fetch('/api/companies/me', {
@@ -59,12 +68,6 @@ export default function MyProfile() {
 
                 dispatch(setCredentials({company}));
                 setCompanyStatus(company.status);
-
-                // Check completeness
-                const hasCompanyInfo = company.pan && company.gst && company.tan;
-                const hasBankingInfo = banking && banking.account_number && banking.ifsc_code && banking.bank_name;
-
-                setIsProfileComplete(!!(hasCompanyInfo && hasBankingInfo));
 
                 methods.reset({
                     // Company Info
@@ -111,29 +114,6 @@ export default function MyProfile() {
         fetchProfile();
     }, [fetchProfile]);
 
-    const handleRequestVerification = async () => {
-        if (!isProfileComplete) return;
-        if (!confirm("Are you sure you want to request verification? Ensure all details are correct.")) return;
-
-        setIsSubmitting(true);
-        try {
-            const res = await fetch('/api/companies/request-verification', {
-                method: 'POST',
-            });
-            const result = await res.json();
-
-            if (!res.ok) throw new Error(result.message || 'Request failed');
-
-            alert('Verification request sent successfully! An admin will review your details.');
-            fetchProfile(); // Refresh to update status
-        } catch (error: any) {
-            console.error('Verification request failed:', error);
-            alert(error.message || 'Failed to request verification');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     const onSubmit = async (data: FormValues) => {
         if (!company?.id) {
             alert("Session expired. Please login again.");
@@ -142,6 +122,7 @@ export default function MyProfile() {
 
         setIsSubmitting(true);
         try {
+            // 1. Save the current tab data
             let payload: any = {};
             let updateType = '';
 
@@ -199,8 +180,8 @@ export default function MyProfile() {
 
             if (!res.ok) throw new Error(result.message || 'Update failed');
 
-            alert(`${tabs.find(t => t.id === activeTab)?.label} updated successfully!`);
-            fetchProfile(); // Refresh profile to check completeness again
+
+          await  fetchProfile();
 
         } catch (error: any) {
             console.error('Update failed:', error);
@@ -222,6 +203,16 @@ export default function MyProfile() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
             </div>
         );
+    }
+
+    // Determine Button Text
+    let saveButtonText = "Save Draft";
+    if (isProfileComplete) {
+        if (companyStatus === 'PENDING' || companyStatus === 'REJECTED') {
+            saveButtonText = "Save & Request Verification";
+        } else {
+            saveButtonText = "Save Changes";
+        }
     }
 
     return (
@@ -276,24 +267,6 @@ export default function MyProfile() {
                     <div
                         className="fixed bottom-0 right-0 left-0 md:left-64 bg-white border-t border-gray-200 p-4 flex justify-end items-center gap-4 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
 
-                        {/* Request Verification Button - Only show if PENDING/REJECTED and Profile Complete */}
-                        {(companyStatus === 'PENDING' || companyStatus === 'REJECTED') && (
-                            <button
-                                type="button"
-                                disabled={!isProfileComplete || isSubmitting}
-                                onClick={handleRequestVerification}
-                                className={`
-                                    px-6 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2
-                                    ${isProfileComplete
-                                    ? 'bg-orange-600 text-white hover:bg-orange-700'
-                                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'}
-                                `}
-                                title={!isProfileComplete ? "Complete all mandatory fields (PAN, GST, TAN, Banking) to request verification" : "Send profile for admin approval"}
-                            >
-                                {isSubmitting ? 'Processing...' : 'Request Verification'}
-                            </button>
-                        )}
-
                         <button
                             type="button"
                             disabled={isSubmitting}
@@ -305,11 +278,13 @@ export default function MyProfile() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-6 py-2.5 bg-[#0a1128] text-white rounded-lg hover:bg-[#1a2340] font-medium text-sm transition-colors disabled:opacity-70 flex items-center gap-2"
+                            className={`px-6 py-2.5 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-70 flex items-center gap-2
+                             ${isProfileComplete && (companyStatus === 'PENDING' || companyStatus === 'REJECTED') ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#0a1128] hover:bg-[#1a2340]'}
+                            `}
                         >
                             {isSubmitting && <div
                                 className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
-                            Save
+                            {saveButtonText}
                         </button>
                     </div>
                 </form>
