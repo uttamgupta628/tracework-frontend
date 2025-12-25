@@ -83,7 +83,7 @@ export default function HeroSection() {
         {/* Button positioned at center */}
         <div className="absolute top-3/4 left-[130.5] transform -translate-x-1/2 -translate-y-1/2 z-20">
           <Link
-            href="/find-services"
+            href="/users"
             className="
               inline-flex items-center justify-center
               px-12 py-4
